@@ -95,6 +95,13 @@ def get_property(section, property_name):
             pass
     return prop
 
+def add_section(section_name):
+    try:
+        if os.path.isfile('config.oscm'):
+            config.read('config.oscm')
+            config.add_section(section_name)
+    except:
+        pass
 
 def set_property(section, property_name, value):
     init()
