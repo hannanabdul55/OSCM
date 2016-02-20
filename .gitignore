@@ -9,6 +9,9 @@ __pycache__/
 # OSCM config files
 *.oscm
 
+#Database
+*.sqlite3
+
 # Distribution / packaging
 .Python
 env/
