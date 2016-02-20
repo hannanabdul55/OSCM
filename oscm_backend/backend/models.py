@@ -13,10 +13,12 @@ class SoftwareConfiguration(models.Model):
     )
 
     ARCH_32 = 32
-    ARCH_64 = 32
+    ARCH_64 = 64
+    ARCH_BOTH = 16
     ARCH_CHOICES = (
         (ARCH_32, "32-bit"),
         (ARCH_64, "64-bit"),
+        (ARCH_BOTH, "both"),
     )
 
     name = models.CharField(max_length=500, blank=True, null=True)
