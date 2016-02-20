@@ -1,5 +1,5 @@
 import click
-
+import initialize
 @click.group()
 def cli():
     pass
@@ -42,6 +42,9 @@ def add_software(name=None, version=None, url=None, os=None, cmd=None, tag=None,
 def dummy():
     print "Hey"
 
+@cli.command()
+def init():
+    initialize.initialize()
 
 
 #addsoftware(name="CallTest", version="None", url="None", os="None", cmd="hi", tag="great", arch="64")

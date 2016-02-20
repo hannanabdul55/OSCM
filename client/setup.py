@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='oscm',
     version='0.1',
-    py_modules=['oscm'],
+    py_modules=['oscm','initialize','generate','utils'],
     install_requires=[
         'Click',
     ],
