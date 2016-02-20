@@ -1,18 +1,48 @@
-# Create your views here.
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from backend.models import SoftwareConfiguration
 from backend.serializers import SoftwareConfigurationSerializer
 
 
-class PushAPIView(ListAPIView):
-    def get(self, request, *args, **kwargs):
-        return Response("Successfully called Push")
+# Utility functions
+def get_db_os_version(value_object):
+    def get_db_os_for(this_value):
+        if 'darwin' in this_value.lower():
+            return SoftwareConfiguration.OS_MAC
+        elif 'linux' in this_value.lower():
+            return SoftwareConfiguration.OS_LINUX
+
+    if isinstance(value_object, list):
+        returns = []
+        for value in value_object:
+            returns.append(get_db_os_for(value))
+        return returns
+
+    elif isinstance(value_object, str):
+        return get_db_os_for(value_object)
 
 
-class PullAPIView(ListAPIView):
+# Create your views here.
+class PutAPIView(ListAPIView):
     def get(self, request, *args, **kwargs):
-        return Response("Successfully called Pull")
+        return Response("Successfully called Put API")
+
+
+class GetAPIView(ListAPIView):
+    def get(self, request, *args, **kwargs):
+        params = dict(request.query_params)
+        for k, v in params.iteritems():
+            params[k] = v[0] if isinstance(v, list) and len(v) == 1 else v
+            if k == "os":
+                params[k] = get_db_os_version(v)
+        filters = {}
+        for k, v in params.iteritems():
+            if isinstance(v, list):
+                filters['%s__in' % k] = v
+            else:
+                filters['%s__icontains' % k] = v
+        soft_configs = SoftwareConfiguration.objects.filter(**filters)
+        return Response(soft_configs)
 
 
 class SearchAPIView(ListAPIView):
@@ -28,10 +58,10 @@ class SearchAPIView(ListAPIView):
             except:
                 return Response(
                 {
-                    "msg": "Invalid query or parameters"
+                    "error": "Invalid query or parameters"
                 }, status=400)
 
         return Response(
             {
-                "msg": "No parameters or queries provided"
+                "error": "No parameters or queries provided"
             }, status=400)
