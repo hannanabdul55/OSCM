@@ -98,12 +98,16 @@ class GetAPIView(ListAPIView):
 
 
 class SearchAPIView(ListAPIView):
+    serializer_class = SoftwareConfigurationSerializer
+    queryset = None
+
     def get(self, request, *args, **kwargs):
         tag = request.query_params.get('tag', None)
         if tag:
             try:
                 soft_configs = SoftwareConfiguration.objects.filter(
                     tag__icontains=tag)
+                self.queryset = soft_configs
                 return Response(serialize_soft_configs(soft_configs))
             except:
                 return Response(
