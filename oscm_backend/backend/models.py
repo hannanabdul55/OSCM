@@ -5,10 +5,10 @@ from django.db import models
 
 # Create your models here.
 class SoftwareConfiguration(models.Model):
-    OS_MAC = 0
+    OS_DARWIN = 0
     OS_LINUX = 1
     OS_CHOICES = (
-        (OS_MAC, "OS_MAC"),
+        (OS_DARWIN, "OS_DARWIN"),
         (OS_LINUX, "OS_LINUX"),
     )
 
@@ -21,7 +21,8 @@ class SoftwareConfiguration(models.Model):
 
     name = models.CharField(max_length=500, blank=True, null=True)
     version = models.CharField(max_length=100, blank=True, null=True)
-    os = models.IntegerField(choices=OS_CHOICES, default=OS_MAC)
+    os = models.IntegerField(choices=OS_CHOICES, default=OS_DARWIN)
     arch = models.IntegerField(choices=ARCH_CHOICES, default=ARCH_64)
-    value = models.CharField(max_length=500, blank=True, null=True)
+    command = models.CharField(max_length=500, blank=True, null=True)
+    url = models.URLField(max_length=500, blank=True, null=True)
     tag = models.CharField(max_length=500, blank=True, null=True)
