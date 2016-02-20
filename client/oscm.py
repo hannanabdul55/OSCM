@@ -1,16 +1,17 @@
 import click
-<<<<<<< HEAD
 from click.testing import CliRunner
 import requests
 import urllib
+import initialize
+import six
+import subprocess
+import json
 
 endpoint_url = "http://52.34.230.77:9123/backend/"
 put = "put/?"
 get = "get/?"
+param_file = "my_file"
 
-=======
-import initialize
->>>>>>> 8b4abac8d7db134fddb2c01fcec721556e5de50c
 @click.group()
 def cli():
     pass
@@ -47,22 +48,37 @@ def cli():
     help = '32 bit or 64 bit; x86 is 32 bit.',
     required=True)
 def addsoftware(name=None, version=None, url=None, os=None, cmd=None, tag=None, arch=None):
-    print name, version, url, os, cmd, tag, arch
     add_software(name, version, url, os, cmd, tag, arch)
 
 def add_software(name=None, version=None, url=None, os=None, cmd=None, tag=None, arch=None):
-    global endpoint_url, put
+    global endpoint_url, put, param_file
     endpoint = endpoint_url + put
     params = {"name": name, "version": version, "os": os, "arch": arch, "command": cmd, "url": url, "tag": tag}
     params = dict((k,v) for k,v in params.items() if v.lower() != 'n')
     response = requests.get("%s%s" %(endpoint, urllib.urlencode(params)))
     print_status(response) 
+    print params
 
-
+    # save to file:
+    with open(param_file, 'w') as f:
+        json.dump(params, f)
 
 @cli.command()
 def init():
     initialize.initialize()
+
+@cli.command()
+def tester():
+    call_command('addsoftware')
+    global param_file
+    data = None
+    with open(param_file, 'r') as f:
+        try:
+            data = json.load(f)
+        # if the file is empty the ValueError will be thrown
+        except ValueError:
+            data = {}
+    print data
 
 def print_status(response):
     if response.status_code == 201:
@@ -71,6 +87,14 @@ def print_status(response):
         click.echo("Software wasn't added. Network error.")
 
 def call_command(cmdname):
-    runner = CliRunner()
-    result = runner.invoke(cli, [cmdname])
-    return result.output.strip()
+    '''runner = CliRunner()
+    result = runner.invoke(cli, [cmdname])'''
+    cmdname = 'oscm '+cmdname
+    #result,error = subprocess.Popen(cmdname,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
+    subprocess.call(cmdname, shell=True)
+    
+    '''if isinstance(result, six.string_types):
+        return result.output.strip()    
+    else:
+        return result.output
+        '''
