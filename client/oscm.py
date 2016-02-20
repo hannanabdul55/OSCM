@@ -1,4 +1,5 @@
 import click
+<<<<<<< HEAD
 from click.testing import CliRunner
 import requests
 import urllib
@@ -7,6 +8,9 @@ endpoint_url = "http://52.34.230.77:9123/backend/"
 put = "put/?"
 get = "get/?"
 
+=======
+import initialize
+>>>>>>> 8b4abac8d7db134fddb2c01fcec721556e5de50c
 @click.group()
 def cli():
     pass
@@ -54,8 +58,13 @@ def add_software(name=None, version=None, url=None, os=None, cmd=None, tag=None,
     response = requests.get("%s%s" %(endpoint, urllib.urlencode(params)))
     print_status(response) 
 
-def print_status(response):
 
+
+@cli.command()
+def init():
+    initialize.initialize()
+
+def print_status(response):
     if response.status_code == 201:
         click.echo("Software added successfully.")
     else:

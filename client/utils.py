@@ -6,7 +6,7 @@ import platform
 import requests
 
 config = None
-API_ENDPOINT = "http://localhost:9123/backend"
+API_ENDPOINT = "http://52.34.230.77:9123/backend"
 
 
 def init():

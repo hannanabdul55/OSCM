@@ -12,17 +12,19 @@ class SoftwareConfiguration(models.Model):
         (OS_LINUX, "OS_LINUX"),
     )
 
-    ARCH_32 = 32
-    ARCH_64 = 32
+    ARCH_32 = '32'
+    ARCH_64 = '64'
+    ARCH_BOTH = 'both'
     ARCH_CHOICES = (
         (ARCH_32, "32-bit"),
         (ARCH_64, "64-bit"),
+        (ARCH_BOTH, "both"),
     )
 
     name = models.CharField(max_length=500, blank=True, null=True)
     version = models.CharField(max_length=100, blank=True, null=True)
     os = models.IntegerField(choices=OS_CHOICES, default=OS_DARWIN)
-    arch = models.IntegerField(choices=ARCH_CHOICES, default=ARCH_64)
+    arch = models.CharField(max_length=10, choices=ARCH_CHOICES, default=ARCH_64)
     command = models.CharField(max_length=500, blank=True, null=True)
     url = models.URLField(max_length=500, blank=True, null=True)
     tag = models.CharField(max_length=500, blank=True, null=True)

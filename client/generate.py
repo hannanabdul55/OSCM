@@ -1,6 +1,7 @@
 from glob import glob
 import utils
 import os
+import oscm
 SOFTWARE_CONFIG_NAME = "package.oscm"
 def app_list_filter(item):
     return not (str(item).startswith(".") or str(item) == "node_modules")
@@ -14,8 +15,10 @@ def generate(initial=True):
         app_ret.resolve(app)
         utils.add_section(app)
         utils.set_property(app_ret.name,"version",app_ret.version)
-    
-
+        if len(app_ret.extras.keys())>0:
+            for key in app_ret.extras.keys():
+                utils.set_property(app_ret.name,key,app_ret.extras.get(key,""))
+    return {"code": 1}
 
 
 def determine_version(app):
@@ -64,6 +67,7 @@ class Application:
         self.name = ""
         self.version = "0"
         self.is_custom = False
+        self.extras = {}
     
     def set_version(self,version):
         self.version = version
@@ -75,6 +79,11 @@ class Application:
         if len(a)>0:
             self.name = a[0]
             self.resolve_version(name)
+            if self.name == "eclipse":
+                if str(raw_input('Do you want to add plugins to the eclipse folder?(Y/n)')).lower() == "y":
+                    s = str(raw_input("Enter the plugin zip URLs separated by commas (,):"))
+                    if len(s)>0:
+                        self.extras["plugins"] = s
         else:
             conf_file = os.path.join(os.getcwd(),name,SOFTWARE_CONFIG_NAME)
             if os.path.isfile(conf_file):
@@ -83,10 +92,12 @@ class Application:
                 self.custom_conf = con
                 self.name = con['name']
                 self.version = con['version']
+                add_custom_soft_conf(con)
                 #TODO: Add into db @narendranathjoshi
             else:
                 #TODO: prompt by @ravisvi
-                print "RAVI BC! Complete Kar"
+                pass
+                #oscm.addsoftware()
 
 if __name__ == "__main__":
     generate()
