@@ -67,6 +67,8 @@ class Application:
         self.name = ""
         self.version = "0"
         self.is_custom = False
+        self.url = None
+        self.cmd = None
         self.extras = {}
     
     def set_version(self,version):
@@ -92,12 +94,25 @@ class Application:
                 self.custom_conf = con
                 self.name = con['name']
                 self.version = con['version']
+                self.url = con['url']
+                self.cmd = con['cmd']
                 add_custom_soft_conf(con)
-                #TODO: Add into db @narendranathjoshi
+                
             else:
-                #TODO: prompt by @ravisvi
-                pass
-                #oscm.addsoftware()
+                oscm.call_command('addsoftware')
+                result = None
+                with open("my_file", 'r') as f:
+                    try:
+                        result = json.load(f)
+                    # if the file is empty the ValueError will be thrown
+                    except ValueError:
+                        result = {}
+                self.is_custom = True
+                self.name = result['name']
+                self.version = result['version']
+                self.url = result['url']
+                self.cmd = result['cmd']
+                
 
 if __name__ == "__main__":
     generate()
