@@ -36,7 +36,7 @@ def addsoftware(name=None, version=None, url=None, os=None, cmd=None, tag=None, 
     add_software(name, version, url, os, cmd, tag, arch)
 
 def add_software(name=None, version=None, url=None, os=None, cmd=None, tag=None, arch=None):
-    print calling like a boss
+    print 'calling like a boss'
 
 @cli.command()
 def dummy():
