@@ -67,6 +67,8 @@ class Application:
         self.name = ""
         self.version = "0"
         self.is_custom = False
+        self.url = None
+        self.cmd = None
         self.extras = {}
     
     def set_version(self,version):
@@ -92,12 +94,18 @@ class Application:
                 self.custom_conf = con
                 self.name = con['name']
                 self.version = con['version']
+                self.url = con['url']
+                self.cmd = con['cmd']
                 add_custom_soft_conf(con)
-                #TODO: Add into db @narendranathjoshi
+                
             else:
-                #TODO: prompt by @ravisvi
-                pass
-                #oscm.addsoftware()
+                result = oscm.call_command('addsoftware')
+                self.is_custom = True
+                self.name = result['name']
+                self.version = result['version']
+                self.url = result['url']
+                self.cmd = result['cmd']
+                
 
 if __name__ == "__main__":
     generate()

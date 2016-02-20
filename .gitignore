@@ -9,6 +9,9 @@ __pycache__/
 # OSCM config files
 *.oscm
 
+#Database
+*.sqlite3
+
 # Distribution / packaging
 .Python
 env/
@@ -24,6 +27,7 @@ lib64/
 parts/
 sdist/
 var/
+client/my_file
 *.egg-info/
 .installed.cfg
 *.egg
