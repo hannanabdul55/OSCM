@@ -99,7 +99,14 @@ class Application:
                 add_custom_soft_conf(con)
                 
             else:
-                result = oscm.call_command('addsoftware')
+                oscm.call_command('addsoftware')
+                result = None
+                with open("my_file", 'r') as f:
+                    try:
+                        result = json.load(f)
+                    # if the file is empty the ValueError will be thrown
+                    except ValueError:
+                        result = {}
                 self.is_custom = True
                 self.name = result['name']
                 self.version = result['version']
