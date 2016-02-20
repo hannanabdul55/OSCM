@@ -2,7 +2,7 @@ import ConfigParser
 import os
 import subprocess
 import platform
-
+import urllib
 import requests
 
 config = None
@@ -72,6 +72,13 @@ def search_by_tag(tag):
     else:
         return None
 
+
+def get_info(q):
+    response = requests.get("%s/get/?%s" % (API_ENDPOINT, urllib.urlencode(q)))
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
 
 def get_os():
     return platform.system().lower()

@@ -1,5 +1,6 @@
 import click
 import initialize
+import pull_repo
 @click.group()
 def cli():
     pass
@@ -46,5 +47,11 @@ def dummy():
 def init():
     initialize.initialize()
 
+@cli.command()
+@click.option('--repo', '-r', 'repo',
+              prompt='Enter the repo clone URL',
+              help='The repo clone URL')
+def pull(repo):
+    pull_repo.pull(repo)
 
 #addsoftware(name="CallTest", version="None", url="None", os="None", cmd="hi", tag="great", arch="64")
