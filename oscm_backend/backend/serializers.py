@@ -5,4 +5,4 @@ from backend.models import SoftwareConfiguration
 class SoftwareConfigurationSerializer(ModelSerializer):
     class Meta:
         model = SoftwareConfiguration
-        exclude = ()
+        fields = '__all__'
