@@ -84,7 +84,6 @@ def init(url):
 
 @cli.command()
 @click.option('--repo', '-r', 'repo',
-              prompt='Enter the repo clone URL',
               help='The repo clone URL')
 def pull(repo):
 

@@ -21,8 +21,8 @@ def init():
 
 def compare():
     global conf_path, bak_path
-    #utils.create_backup(conf_path)
-    #subprocess.call("git pull", shell=True)
+    utils.create_backup(conf_path)
+    subprocess.call("git pull", shell=True)
     init()
     conf.read(conf_path)
     original_secs = conf.sections()
@@ -50,6 +50,7 @@ def compare():
                 else:
                     #remove plugins
                     pass
+    os.remove(bak_path)
 
 
 def download_sec(sec,config_file):
