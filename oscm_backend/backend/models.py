@@ -14,8 +14,8 @@ class SoftwareConfiguration(models.Model):
         (OS_LINUX, "OS_LINUX"),
     )
 
-    ARCH_32 = '32'
-    ARCH_64 = '64'
+    ARCH_32 = '32bit'
+    ARCH_64 = '64bit'
     ARCH_BOTH = 'both'
     ARCH_CHOICES = (
         (ARCH_32, "32-bit"),
