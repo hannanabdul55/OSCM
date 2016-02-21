@@ -2,6 +2,7 @@ from glob import glob
 import utils
 import os
 import oscm
+import json
 SOFTWARE_CONFIG_NAME = "package.oscm"
 def app_list_filter(item):
     return not (str(item).startswith(".") or str(item) == "node_modules")
@@ -110,8 +111,8 @@ class Application:
                 self.is_custom = True
                 self.name = result['name']
                 self.version = result['version']
-                self.url = result['url']
-                self.cmd = result['cmd']
+                self.url = result.get('url','')
+                self.cmd = result.get('cmd','')
                 
 
 if __name__ == "__main__":
