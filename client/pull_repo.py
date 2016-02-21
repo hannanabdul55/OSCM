@@ -133,7 +133,7 @@ def parse_config(config_file):
                 subprocess.call(software['cmd'], shell=True)
             elif len(software["url"])>0:
                 print software["url"]
-                if os.path.isfile(os.path.basename(software["url"])):
+                if not os.path.isfile(os.path.basename(software["url"])):
                     print 'Downloading ' +sec +'...'
                     r = requests.get(software["url"], stream=True)
                     if r.status_code == 200:
