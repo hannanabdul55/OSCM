@@ -10,8 +10,8 @@ import zipfile
 import subprocess
 
 conf = None
-conf_path = "conf/config.oscm"
-bak_path = "conf/config.bak"
+conf_path = "config.oscm"
+bak_path = "config.bak"
 
 def init():
     global conf, conf2
@@ -87,7 +87,7 @@ def download_sec(sec,config_file):
             subprocess.call(['tar','-xvf',os.path.basename(software["url"])])
 
 def pull(repo=None):
-    global conf
+    global conf, conf_path
     init()
     # cfg file exists
     if os.path.isfile(conf_path):
@@ -96,7 +96,10 @@ def pull(repo=None):
         parse_config(conf)
     else :
         print 'Downloading repo'
-        Repo.clone_from(repo,"conf")
+        subprocess.call('git clone '+repo, shell=True)
+        #todo: Bro
+        conf_path = os.path.join(os.path.basename(repo).split('.git')[0], conf_path)
+        print conf_path
         if os.path.isfile(conf_path):
             conf.read(conf_path)
             parse_config(conf)
@@ -125,7 +128,7 @@ def parse_config(config_file):
             "version" : v,
             "arch" : arch
         })
-        print d
+        print d , str({"name" : sec,"os" : OS,"version" : v,"arch" : arch})
         for software in d:
             if len(software.get('cmd',''))>0:
                 subprocess.call(software['cmd'], shell=True)
