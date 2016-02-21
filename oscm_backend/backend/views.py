@@ -88,7 +88,11 @@ class GetAPIView(ListAPIView):
             if isinstance(v, list):
                 filters['%s__in' % k] = v
             else:
-                filters['%s__icontains' % k] = v
+                if "arch" in k:
+                    filters['%s__in' % k] = [str(v), SoftwareConfiguration.ARCH_BOTH]
+                else:
+                    filters['%s__icontains' % k] = v
+        print filters
         soft_configs = SoftwareConfiguration.objects.filter(**filters)
         response = serialize_soft_configs(soft_configs)
         for index in range(len(response)):
