@@ -82,7 +82,6 @@ def init(url):
     subprocess.call("git remote add origin %s" % url, shell=True)
 
 
-
 @cli.command()
 @click.option('--repo', '-r', 'repo',
               prompt='Enter the repo clone URL',
