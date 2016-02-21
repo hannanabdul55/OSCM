@@ -35,6 +35,7 @@ def compare():
     for sec in updated_secs:
         print sec
         if sec not in original_secs:
+            download_sec(sec,conf2)
             print 'abdul bc will write install thingy for software ' + sec
             #download_sec_install_add_plugins()
         if sec.strip() == 'eclipse':
@@ -50,6 +51,43 @@ def compare():
                     #remove plugins
                     pass
 
+
+def download_sec(sec,config_file):
+    v="0"
+    if config_file.has_option(sec,"version"):
+        v = config_file.get(sec,"version")
+    OS = utils.get_os()
+    arch = utils.get_arch()
+    d = utils.get_info({
+        "name" : sec,
+        "os" : OS,
+        "version" : v,
+        "arch" : arch
+    })
+    for software in d:
+        if len(software['cmd'])>0:
+            subprocess.call(software['cmd'], shell=True)
+        elif len(software["url"])>0:
+            if os.path.isfile(os.path.basename(software["url"])):
+                print 'Downloading ' +sec +'...'
+                r = requests.get(software["url"], stream=True)
+                if r.status_code == 200:
+                    with open(os.path.basename(software["url"]), 'wb') as f:
+                        for chunk in r:
+                            f.write(chunk)
+                        if tarfile.is_tarfile(f.name):
+                            tfile = tarfile.open(os.path.basename(software["url"]), "r:gz")
+                            tfile.extractall(sec)
+                        elif zipfile.is_zipfile(f.name):
+                            z = zipfile.ZipFile(f)
+                            z.extractall(sec)
+                else:
+                    print 'Error downloading package, Please download ' + sec + ' on your own!'
+            else:
+                print sec + ' already present in folder, extracting...'
+            print 'Running command ' + str(['tar','-xvf',os.path.basename(software["url"])])
+            subprocess.call(['tar','-xvf',os.path.basename(software["url"])])
+
 def pull(repo=None):
     global conf
     init()
@@ -58,7 +96,8 @@ def pull(repo=None):
         compare()
         conf.read(conf_path)
         parse_config(conf)
-    elif not repo :
+    else :
+        print 'Downloading repo'
         Repo.clone_from(repo,"conf")
         if os.path.isfile(conf_path):
             conf.read(conf_path)
@@ -68,7 +107,7 @@ def download_file(url):
     r = requests.get(url, stream=True)
     ret = ""
     if r.status_code == 200:
-        with open(os.path.basename(software["url"]), 'wb') as f:
+        with open(os.path.basename(url), 'wb') as f:
             for chunk in r:
                 f.write(chunk)
             ret = f.name
@@ -88,8 +127,12 @@ def parse_config(config_file):
             "version" : v,
             "arch" : arch
         })
+        print d
         for software in d:
-            if len(software["url"])>0:
+            if len(software.get('cmd',''))>0:
+                subprocess.call(software['cmd'], shell=True)
+            elif len(software["url"])>0:
+                print software["url"]
                 if os.path.isfile(os.path.basename(software["url"])):
                     print 'Downloading ' +sec +'...'
                     r = requests.get(software["url"], stream=True)
@@ -97,17 +140,24 @@ def parse_config(config_file):
                         with open(os.path.basename(software["url"]), 'wb') as f:
                             for chunk in r:
                                 f.write(chunk)
-                            if tarfile.is_tarfile(f.name):
-                                tfile = tarfile.open(os.path.basename(software["url"]), "r:gz")
-                                tfile.extractall(sec)
-                            elif zipfile.is_zipfile(f.name):
-                                z = zipfile.ZipFile(f)
-                                z.extractall(sec)
+                            # if tarfile.is_tarfile(f.name):
+                            #     tfile = tarfile.open(os.path.basename(software["url"]), "r:gz")
+                            #     tfile.extractall(sec)
+                            # elif zipfile.is_zipfile(f.name):
+                            #     z = zipfile.ZipFile(f)
+                            #     z.extractall(sec)
+                            subprocess.call('tar -xvf '+ f.name,shell=True)
                     else:
                         print 'Error downloading package, Please download ' + sec + ' on your own!'
                 else:
                     print sec + ' already present in folder, extracting...'
-                subprocess.call(['tar','-xvf',os.path.basename(software["url"])])
+                subprocess.call('tar -xvf '+ os.path.basename(software["url"]),shell=True)
+                # if tarfile.is_tarfile(os.path.basename(software["url"])):
+                #     tfile = tarfile.open(os.path.basename(software["url"]), "r:gz")
+                #     tfile.extractall(sec)
+                # elif zipfile.is_zipfile(os.path.basename(software["url"])):
+                #     z = zipfile.ZipFile(os.path.basename(software["url"]))
+                #     z.extractall(sec)
         if not os.path.exists(sec):
             os.mkdir(sec)
         if sec == 'eclipse':
@@ -118,5 +168,8 @@ def parse_config(config_file):
                         f = download_file(plugin)
                         if len(f)>0 and zipfile.is_zipfile(f):
                             z = zipfile.ZipFile(open(f,"rb"))
-                            z.extractall(os.path.join(os.getcwd(),sec,"dropins"),os.path.splitext(f)[0])
+                            path = os.path.join(os.getcwd(),"eclipse","dropins",os.path.splitext(f)[0])
+                            if not os.path.exists(path):
+                                os.makedirs(path)
+                            z.extractall(path)
         

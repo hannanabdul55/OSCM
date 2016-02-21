@@ -89,8 +89,11 @@ def get_os():
 
 
 def get_arch():
-    return platform.architecture()[0]
-
+    arch = platform.architecture()[0]
+    if '64' in arch:
+        return '64'
+    else:
+        return '32'
 
 def get_property(section, property_name):
     init()
