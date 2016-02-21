@@ -63,8 +63,8 @@ def download_sec(sec,config_file):
         "arch" : arch
     })
     for software in d:
-        if len(software['cmd'])>0:
-            subprocess.call(software['cmd'], shell=True)
+        if len(software['command'])>0:
+            subprocess.call(software['command'], shell=True)
         elif len(software["url"])>0:
             if os.path.isfile(os.path.basename(software["url"])):
                 print 'Downloading ' +sec +'...'
@@ -130,8 +130,8 @@ def parse_config(config_file):
         })
         print d , str({"name" : sec,"os" : OS,"version" : v,"arch" : arch})
         for software in d:
-            if len(software.get('cmd',''))>0:
-                subprocess.call(software['cmd'], shell=True)
+            if len(software.get('command',''))>0:
+                subprocess.call(software['command'], shell=True)
             elif len(software["url"])>0:
                 print software["url"]
                 if not os.path.isfile(os.path.basename(software["url"])):
