@@ -8,12 +8,59 @@ import gzip
 import tarfile
 import zipfile
 
-def pull(repo=None):
-    if repo != None:
-        Repo.clone_from(repo,"conf")
+conf = None
+conf_path = "conf/config.oscm"
+bak_path = "conf/config.bak"
+
+def init():
+    global conf, conf2
+    if not conf or not conf2:
         conf = ConfigParser.RawConfigParser()
-        if os.path.isfile('conf/config.oscm'):
-            conf.read('conf/config.oscm')
+        conf2 = ConfigParser.RawConfigParser()
+
+def compare():
+    global conf_path, bak_path
+    #utils.create_backup(conf_path)
+    #subprocess.call("git pull", shell=True)
+    init()
+    conf.read(conf_path)
+    original_secs = conf.sections()
+    print 'original_secs'
+    print original_secs
+    conf2.read(bak_path)
+    updated_secs = conf2.sections()
+    print 'updated_secs'
+    print updated_secs
+    for sec in updated_secs:
+        print sec
+        if sec not in original_secs:
+            print 'abdul bc will write install thingy for software ' + sec
+            #download_sec_install_add_plugins()
+        if sec.strip() == 'eclipse':
+            plugins = conf.get(sec,"plugins").split(",")
+            if conf.has_option(sec,"plugins"):
+                plugins = conf.get(sec,"plugins").split(",")
+                if conf2.has_option(sec,"plugins"):
+                    new_plugins = conf2.get(sec,"plugins").split(",")
+                    for p in new_plugins:
+                        if p not in plugins:
+                            print 'abdul bc will write install thingy for plugin ' + p
+                else:
+                    #remove plugins
+                    pass
+
+def pull(repo=None):
+    global conf
+    init()
+    # cfg file exists
+    if os.path.isfile(conf_path):
+        compare()
+        conf.read(conf_path)
+        parse_config(conf)
+    elif not repo :
+        Repo.clone_from(repo,"conf")
+        if os.path.isfile(conf_path):
+            conf.read(conf_path)
             parse_config(conf)
 
 def download_file(url):
