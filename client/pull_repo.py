@@ -1,5 +1,6 @@
 import os
 import click
+import requests
 import utils
 from git import Repo
 import ConfigParser
