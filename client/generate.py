@@ -3,7 +3,12 @@ import utils
 import os
 import oscm
 import json
+import requests
+import urllib
 
+endpoint_url = "http://52.34.230.77:9123/backend/"
+put = "put/?"
+get = "get/?"
 SOFTWARE_CONFIG_NAME = "package.oscm"
 
 
@@ -88,21 +93,25 @@ class Application:
     def set_version(self, version):
         self.version = version
 
-    def resolve_version(self, name):
-        self.version = self.appVersionFinder.get(self.name, lambda x: "0")(name)
-
-    def resolve(self, name):
-        a = list(filter(lambda x: x in name, self.applist))
-        if len(a) > 0:
+    
+    def resolve_version(self,name):
+        self.version = self.appVersionFinder.get(self.name,lambda x: "0")(name)
+    def resolve(self,name):
+        global endpoint_url, put
+        endpoint = endpoint_url + put
+        a = list(filter(lambda x : x in name,self.applist))
+        if len(a)>0:
             self.name = a[0]
             self.resolve_version(name)
             if self.name == "eclipse":
-                if str(raw_input(
-                        'Do you want to add plugins to the eclipse folder?(Y/n)')).lower() == "y":
-                    s = str(raw_input(
-                        "Enter the plugin zip URLs separated by commas (,):"))
-                    if len(s) > 0:
+                self.url = "http://archive.eclipse.org/technology/epp/downloads/release/helios/SR2/eclipse-jee-helios-SR2-macosx-cocoa-x86_64.tar.gz"
+                if str(raw_input('Do you want to add plugins to the eclipse folder?(Y/n)')).lower() == "y":
+                    s = str(raw_input("Enter the plugin zip URLs separated by commas (,):"))
+                    if len(s)>0:
                         self.extras["plugins"] = s
+            params = {"name": self.name, "version": self.version, "os": utils.get_os(), "arch": utils.get_arch(), "url": self.url}
+            params = dict((k,v) for k,v in params.items() if v.lower() != 'n')
+            response = requests.get("%s%s" %(endpoint, urllib.urlencode(params)))
         else:
             conf_file = os.path.join(os.getcwd(), name, SOFTWARE_CONFIG_NAME)
             if os.path.isfile(conf_file):
@@ -114,7 +123,9 @@ class Application:
                 self.url = con['url']
                 self.cmd = con['cmd']
                 add_custom_soft_conf(con)
-
+                params = {"name": self.name, "version": self.version, "os": utils.get_os(), "arch": utils.get_arch(), "command": self.cmd, "url": self.url, "tag": con.get('tag','n')}
+                params = dict((k,v) for k,v in params.items() if v.lower() != 'n')
+                response = requests.get("%s%s" %(endpoint, urllib.urlencode(params)))
             else:
                 oscm.call_command('addsoftware')
                 result = None
