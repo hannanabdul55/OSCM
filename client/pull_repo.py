@@ -90,7 +90,7 @@ def pull(repo=None):
     global conf, conf_path
     init()
     # cfg file exists
-    if os.path.isfile(conf_path):
+    if os.path.isfile(conf_path) or os.path.exists(".git"):
         compare()
         conf.read(conf_path)
         parse_config(conf)
