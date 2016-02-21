@@ -36,7 +36,7 @@ def compare():
         print sec
         if sec not in original_secs:
             download_sec(sec,conf2)
-            print 'abdul bc will write install thingy for software ' + sec
+            #print 'abdul bc will write install thingy for software ' + sec
             #download_sec_install_add_plugins()
         if sec.strip() == 'eclipse':
             plugins = conf.get(sec,"plugins").split(",")
@@ -46,6 +46,18 @@ def compare():
                     new_plugins = conf2.get(sec,"plugins").split(",")
                     for p in new_plugins:
                         if p not in plugins:
+                            if sec == 'eclipse':
+                                if conf2.has_option(sec,"plugins"):
+                                    plugins = conf2.get(sec,"plugins").split(",")
+                                    if os.path.isdir(os.path.join(os.getcwd(),sec,"dropins")):
+                                        for plugin in plugins:
+                                            f = download_file(plugin)
+                                            if len(f)>0 and zipfile.is_zipfile(f):
+                                                z = zipfile.ZipFile(open(f,"rb"))
+                                                path = os.path.join(os.getcwd(),"eclipse","dropins",os.path.splitext(f)[0])
+                                                if not os.path.exists(path):
+                                                    os.makedirs(path)
+                                                z.extractall(path)
                             print 'abdul bc will write install thingy for plugin ' + p
                 else:
                     #remove plugins
