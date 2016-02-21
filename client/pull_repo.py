@@ -21,14 +21,14 @@ def init():
 
 def compare():
     global conf_path, bak_path
-    utils.create_backup(conf_path)
-    subprocess.call("git pull", shell=True)
+    #utils.create_backup(conf_path)
     init()
     conf.read(conf_path)
     original_secs = conf.sections()
     print 'original_secs'
     print original_secs
-    conf2.read(bak_path)
+    subprocess.call("git pull", shell=True)
+    conf2.read(conf_path)
     updated_secs = conf2.sections()
     print 'updated_secs'
     print updated_secs
@@ -36,8 +36,6 @@ def compare():
         print sec
         if sec not in original_secs:
             download_sec(sec,conf2)
-            print 'abdul bc will write install thingy for software ' + sec
-            #download_sec_install_add_plugins()
         if sec.strip() == 'eclipse':
             plugins = conf.get(sec,"plugins").split(",")
             if conf.has_option(sec,"plugins"):
@@ -48,7 +46,6 @@ def compare():
                         if p not in plugins:
                             print 'abdul bc will write install thingy for plugin ' + p
                 else:
-                    #remove plugins
                     pass
     os.remove(bak_path)
 
