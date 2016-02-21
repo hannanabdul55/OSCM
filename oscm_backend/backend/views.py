@@ -56,8 +56,9 @@ class PutAPIView(ListAPIView):
                     if "tag" in params.keys():
                         soft_config.tag = params["tag"]
                     if "url" in params.keys():
-                        soft_config.tag = params["url"]
-                    soft_config.save()
+                        if params["url"]:
+                            soft_config.tag = params["url"]
+                            soft_config.save()
             else:
                 SoftwareConfiguration.objects.create(**params)
 
