@@ -10,8 +10,8 @@ import zipfile
 import subprocess
 
 conf = None
-conf_path = "conf/config.oscm"
-bak_path = "conf/config.bak"
+conf_path = "config.oscm"
+bak_path = "config.bak"
 
 def init():
     global conf, conf2
@@ -22,13 +22,13 @@ def init():
 def compare():
     global conf_path, bak_path
     #utils.create_backup(conf_path)
-    #subprocess.call("git pull", shell=True)
     init()
     conf.read(conf_path)
     original_secs = conf.sections()
     print 'original_secs'
     print original_secs
-    conf2.read(bak_path)
+    subprocess.call("git pull", shell=True)
+    conf2.read(conf_path)
     updated_secs = conf2.sections()
     print 'updated_secs'
     print updated_secs
@@ -36,8 +36,6 @@ def compare():
         print sec
         if sec not in original_secs:
             download_sec(sec,conf2)
-            #print 'abdul bc will write install thingy for software ' + sec
-            #download_sec_install_add_plugins()
         if sec.strip() == 'eclipse':
             plugins = conf.get(sec,"plugins").split(",")
             if conf.has_option(sec,"plugins"):
@@ -58,10 +56,9 @@ def compare():
                                                 if not os.path.exists(path):
                                                     os.makedirs(path)
                                                 z.extractall(path)
-                            print 'abdul bc will write install thingy for plugin ' + p
                 else:
-                    #remove plugins
                     pass
+    os.remove(bak_path)
 
 
 def download_sec(sec,config_file):
@@ -77,8 +74,8 @@ def download_sec(sec,config_file):
         "arch" : arch
     })
     for software in d:
-        if len(software['cmd'])>0:
-            subprocess.call(software['cmd'], shell=True)
+        if len(software['command'])>0:
+            subprocess.call(software['command'], shell=True)
         elif len(software["url"])>0:
             if os.path.isfile(os.path.basename(software["url"])):
                 print 'Downloading ' +sec +'...'
@@ -101,16 +98,19 @@ def download_sec(sec,config_file):
             subprocess.call(['tar','-xvf',os.path.basename(software["url"])])
 
 def pull(repo=None):
-    global conf
+    global conf, conf_path
     init()
     # cfg file exists
-    if os.path.isfile(conf_path):
+    if os.path.isfile(conf_path) or os.path.exists(".git"):
         compare()
         conf.read(conf_path)
         parse_config(conf)
     else :
         print 'Downloading repo'
-        Repo.clone_from(repo,"conf")
+        subprocess.call('git clone '+repo, shell=True)
+        #todo: Bro
+        conf_path = os.path.join(os.path.basename(repo).split('.git')[0], conf_path)
+        print conf_path
         if os.path.isfile(conf_path):
             conf.read(conf_path)
             parse_config(conf)
@@ -139,10 +139,10 @@ def parse_config(config_file):
             "version" : v,
             "arch" : arch
         })
-        print d
+        print d , str({"name" : sec,"os" : OS,"version" : v,"arch" : arch})
         for software in d:
-            if len(software.get('cmd',''))>0:
-                subprocess.call(software['cmd'], shell=True)
+            if len(software.get('command',''))>0:
+                subprocess.call(software['command'], shell=True)
             elif len(software["url"])>0:
                 print software["url"]
                 if not os.path.isfile(os.path.basename(software["url"])):

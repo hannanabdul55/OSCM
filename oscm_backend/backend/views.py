@@ -90,6 +90,8 @@ class GetAPIView(ListAPIView):
             else:
                 if "arch" in k:
                     filters['%s__in' % k] = [str(v), SoftwareConfiguration.ARCH_BOTH]
+                elif "os" in k:
+                    filters['%s__in' % k] = [str(v), SoftwareConfiguration.OS_ALL]
                 else:
                     filters['%s__icontains' % k] = v
         print filters

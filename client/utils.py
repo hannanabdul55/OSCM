@@ -19,7 +19,7 @@ def current_path():
     return os.getcwd()
 
 def create_backup(filename):
-	src = os.path.join(current_path, filename)
+	src = os.path.join(current_path(), filename)
 	dst = src.replace('.oscm', '.bak')
 	shutil.copy(src, dst)
 
