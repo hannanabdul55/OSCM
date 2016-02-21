@@ -75,6 +75,19 @@ def init():
 def pull(repo):
     pull_repo.pull(repo)
 
+@cli.command()
+@click.option('--repo', '-r', 'repo',
+              help='The repo clone URL')
+def push(repo):
+    pull_repo.pull(repo)
+
+@cli.command()
+@click.option('--repo', '-r', 'repo',
+              prompt='Enter the repo clone URL',
+              help='The repo clone URL')
+def commit(repo):
+    pull_repo.pull(repo)
+
 def tester():
     call_command('addsoftware')
     global param_file
