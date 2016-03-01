@@ -4,7 +4,7 @@ import subprocess
 import platform
 import urllib
 import requests
-import shutil 
+import shutil
 
 config = None
 API_ENDPOINT = "http://52.34.230.77:9123/backend"
@@ -15,13 +15,16 @@ def init():
     if not config:
         config = ConfigParser.RawConfigParser()
 
+
 def current_path():
     return os.getcwd()
 
+
 def create_backup(filename):
-	src = os.path.join(current_path(), filename)
-	dst = src.replace('.oscm', '.bak')
-	shutil.copy(src, dst)
+    src = os.path.join(current_path(), filename)
+    dst = src.replace('.oscm', '.bak')
+    shutil.copy(src, dst)
+
 
 def get_version(software):
     output = subprocess.check_output(
@@ -84,6 +87,7 @@ def get_info(q):
     else:
         return None
 
+
 def get_os():
     return platform.system().lower()
 
@@ -94,6 +98,7 @@ def get_arch():
         return '64'
     else:
         return '32'
+
 
 def get_property(section, property_name):
     init()

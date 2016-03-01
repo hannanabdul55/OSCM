@@ -86,7 +86,6 @@ def init(url):
 @click.option('--repo', '-r', 'repo',
               help='The repo clone URL')
 def pull(repo):
-
     pull_repo.pull(repo)
 
 
