@@ -10,8 +10,8 @@ import zipfile
 import subprocess
 
 conf = None
-conf_path = "conf/config.oscm"
-bak_path = "conf/config.bak"
+conf_path = "config.oscm"
+bak_path = "config.bak"
 
 
 def init():
@@ -46,7 +46,28 @@ def compare():
                     new_plugins = conf2.get(sec, "plugins").split(",")
                     for p in new_plugins:
                         if p not in plugins:
-                            print 'abdul bc will write install thingy for plugin ' + p
+                            if sec == 'eclipse':
+                                if conf2.has_option(sec, "plugins"):
+                                    plugins = conf2.get(sec, "plugins").split(
+                                        ",")
+                                    if os.path.isdir(
+                                            os.path.join(os.getcwd(), sec,
+                                                         "dropins")):
+                                        for plugin in plugins:
+                                            f = download_file(plugin)
+                                            if len(
+                                                    f) > 0 and zipfile.is_zipfile(
+                                                    f):
+                                                z = zipfile.ZipFile(
+                                                    open(f, "rb"))
+                                                path = os.path.join(os.getcwd(),
+                                                                    "eclipse",
+                                                                    "dropins",
+                                                                    os.path.splitext(
+                                                                        f)[0])
+                                                if not os.path.exists(path):
+                                                    os.makedirs(path)
+                                                z.extractall(path)
                 else:
                     pass
     os.remove(bak_path)
@@ -65,8 +86,8 @@ def download_sec(sec, config_file):
         "arch": arch
     })
     for software in d:
-        if len(software['cmd']) > 0:
-            subprocess.call(software['cmd'], shell=True)
+        if len(software['command']) > 0:
+            subprocess.call(software['command'], shell=True)
         elif len(software["url"]) > 0:
             if os.path.isfile(os.path.basename(software["url"])):
                 print 'Downloading ' + sec + '...'
@@ -92,16 +113,20 @@ def download_sec(sec, config_file):
 
 
 def pull(repo=None):
-    global conf
+    global conf, conf_path
     init()
     # cfg file exists
-    if os.path.isfile(conf_path):
+    if os.path.isfile(conf_path) or os.path.exists(".git"):
         compare()
         conf.read(conf_path)
         parse_config(conf)
     else:
         print 'Downloading repo'
-        Repo.clone_from(repo, "conf")
+        subprocess.call('git clone ' + repo, shell=True)
+        # todo: Bro
+        conf_path = os.path.join(os.path.basename(repo).split('.git')[0],
+                                 conf_path)
+        print conf_path
         if os.path.isfile(conf_path):
             conf.read(conf_path)
             parse_config(conf)
@@ -132,10 +157,10 @@ def parse_config(config_file):
             "version": v,
             "arch": arch
         })
-        print d
+        print d, str({"name": sec, "os": OS, "version": v, "arch": arch})
         for software in d:
-            if len(software.get('cmd', '')) > 0:
-                subprocess.call(software['cmd'], shell=True)
+            if len(software.get('command', '')) > 0:
+                subprocess.call(software['command'], shell=True)
             elif len(software["url"]) > 0:
                 print software["url"]
                 if not os.path.isfile(os.path.basename(software["url"])):
